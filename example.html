@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пример виджета WTSay</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            text-align: justify;
+        }
+
+        .wtsay-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .wtsay-section h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .wtsay-widget {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Глава первая. В кроличьей норе</h1>
+        
+        <p>Алисе надоело сидеть на пригорке рядом с сестрой и ничего не делать. Раза два она заглянула украдкой в книгу, которую читала её сестра, но там не было ни разговоров, ни картинок. «Какой толк в книге, – подумала Алиса, – если в ней нет ни картинок, ни разговоров?»
+        <p>Потом она стала раздумывать (насколько вообще это возможно в такой невыносимо жаркий день, когда одолевает дремота), сто́ит ли ей вставать, чтобы пойти нарвать маргаритки и сплести венок, или нет, как вдруг Белый Кролик с розовыми глазками пробежал мимо неё.
+        <p>В этом не было, конечно, ничего особенного. Не удивилась Алиса и тогда, когда Кролик пробормотал себе под нос:
+        <p>– Ах, боже мой, я опоздаю!
+        <p>Думая об этом впоследствии, Алиса не могла понять, почему же она не удивилась, услышав, что Кролик заговорил, но в тот момент это не показалось ей странным. Однако, когда Кролик вынул из жилетного кармана часы и, взглянув на них, побежал дальше, Алиса вскочила, сообразив, что никогда ещё не случалось ей видеть Кролика в жилете и с часами. Сгорая от любопытства, она бросилась за ним и успела заметить, как он юркнул в кроличью нору под живой изгородью.
+
+        <div class="wtsay-section">
+            <h2>💬 Отзывы о книге</h2>
+            <div class="wtsay-widget" data-id="example1.ru"></div>
+        </div>
+
+        <p style="margin-top: 30px; text-align: center; color: #999; font-size: 0.9em;">
+            Пример использования виджета WTSay с отзывами
+        </p>
+    </div>
+
+    <!-- Подключение виджета WTSay -->
+    <script src="http://lumcode.ru/widgets/js/wtsay.js" defer></script>
+</body>
+</html>

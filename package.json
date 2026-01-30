@@ -1,0 +1,10 @@
+{
+  "name": "wtsay",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "php -S localhost:8000 -t ."
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
