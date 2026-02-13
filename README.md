@@ -1,6 +1,6 @@
 # WTSay – What They Say
 
-> **Виджет отзывов для сайтов с централизованной системой управления**
+> **Виджет отзывов для сайтов**
 
 [![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
