@@ -43,7 +43,7 @@
 Добавьте эту строку в `<head>` или перед закрывающим тегом `</body>`:
 
 ```html
-<script src="https://lumcode.ru/widgets/js/wtsay.js" defer></script>
+<script src="https://lumcode.ru/what-they-say/widgets/js/wtsay.js" defer></script>
 ```
 
 ### Шаг 2: Вставьте контейнер
@@ -242,7 +242,7 @@ npm start
 **Пример запроса:**
 
 ```bash
-curl "https://lumcode.ru/api/reviews.php?domain=example.com&page=1&per_page=10&visible=true"
+curl "https://lumcode.ru/what-they-say/api/reviews.php?domain=example.com&page=1&per_page=10&visible=true"
 ```
 
 **Пример ответа:**

@@ -1,5 +1,8 @@
 /.env
 /.env.*
+index.php
+send.php
+.htaccess
 
 # Dependencies
 /vendor/
