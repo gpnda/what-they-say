@@ -64,11 +64,41 @@
 
         <div class="wtsay-section">
             <h2>💬 Отзывы о книге</h2>
+            
+            <!-- Виджет с настройками по умолчанию (10 отзывов на странице) -->
             <div class="wtsay-widget" data-id="playwoods.ru"></div>
         </div>
 
+        <!-- Дополнительные примеры с разными настройками пагинации -->
+        <div class="wtsay-section">
+            <h2>📖 Примеры использования пагинации</h2>
+            
+            <h3 style="color: #666; margin-top: 20px;">1. Компактный виджет (5 отзывов на странице):</h3>
+            <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto;">
+&lt;div class="wtsay-widget" data-id="playwoods.ru" data-per-page="5"&gt;&lt;/div&gt;</pre>
+            
+            <h3 style="color: #666; margin-top: 20px;">2. Стандартный виджет (10 отзывов, по умолчанию):</h3>
+            <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto;">
+&lt;div class="wtsay-widget" data-id="playwoods.ru"&gt;&lt;/div&gt;</pre>
+            
+            <h3 style="color: #666; margin-top: 20px;">3. Расширенный виджет (20 отзывов на странице):</h3>
+            <pre style="background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto;">
+&lt;div class="wtsay-widget" data-id="playwoods.ru" data-per-page="20"&gt;&lt;/div&gt;</pre>
+
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196F3;">
+                <h4 style="margin-top: 0; color: #1976D2;">ℹ️ Возможности пагинации:</h4>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>data-per-page</strong> — количество отзывов на одной странице (по умолчанию: 10)</li>
+                    <li><strong>Кнопка "Загрузить ещё"</strong> — добавляет новые отзывы к уже отображенным</li>
+                    <li><strong>Счетчик отзывов</strong> — показывает сколько отзывов загружено из общего количества</li>
+                    <li><strong>Автоматическое скрытие кнопки</strong> — кнопка исчезает когда все отзывы загружены</li>
+                    <li><strong>Индикатор загрузки</strong> — анимация во время подгрузки новых отзывов</li>
+                </ul>
+            </div>
+        </div>
+
         <p style="margin-top: 30px; text-align: center; color: #999; font-size: 0.9em;">
-            Пример использования виджета WTSay с отзывами
+            Пример использования виджета WTSay с постраничной загрузкой отзывов
         </p>
     </div>
 

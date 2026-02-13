@@ -23,8 +23,18 @@ try {
 
     // Получаем параметры из GET
     $visibleOnly = isset($_GET['visible']) ? (bool)$_GET['visible'] : true;
+    $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+    $perPage = isset($_GET['per_page']) ? max(1, min(100, (int)$_GET['per_page'])) : 10;
+    $offset = ($page - 1) * $perPage;
 
     $reviews_data = [];
+    $meta = [
+        'page' => $page,
+        'per_page' => $perPage,
+        'total' => 0,
+        'total_pages' => 0,
+        'has_more' => false
+    ];
 
     if ($widget_id) {
         // Получаем менеджер отзывов
@@ -35,8 +45,12 @@ try {
         $project = $projectManager->getByDomain($widget_id);
 
         if ($project) {
-            // Получаем отзывы проекта
-            $reviews = $reviewManager->getByProjectId($project['id'], $visibleOnly);
+            // Получаем общее количество отзывов
+            $totalCount = $reviewManager->getTotalCountByProjectId($project['id'], $visibleOnly);
+            $totalPages = ceil($totalCount / $perPage);
+            
+            // Получаем отзывы проекта с пагинацией
+            $reviews = $reviewManager->getByProjectId($project['id'], $visibleOnly, $perPage, $offset);
 
             // Преобразуем данные в формат, совместимый с wtsay.js
             foreach ($reviews as $review) {
@@ -50,11 +64,20 @@ try {
                     "avatar" => $review['reviewer_avatar']
                 ];
             }
+
+            // Обновляем мета-данные
+            $meta['total'] = $totalCount;
+            $meta['total_pages'] = $totalPages;
+            $meta['has_more'] = $page < $totalPages;
         }
     }
 
-    // Возвращаем данные отзывов в формате JSON
-    echo json_encode($reviews_data, JSON_UNESCAPED_UNICODE);
+    // Возвращаем данные с метаинформацией в формате JSON
+    $response = [
+        'data' => $reviews_data,
+        'meta' => $meta
+    ];
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     // В случае ошибки возвращаем пустой массив

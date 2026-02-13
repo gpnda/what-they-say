@@ -68,9 +68,14 @@ class ReviewManager
     }
 
     /**
-     * Получает все отзывы проекта
+     * Получает отзывы проекта с поддержкой пагинации
+     * @param int $projectId ID проекта
+     * @param bool $visibleOnly Только видимые отзывы
+     * @param int|null $limit Количество записей (null = без ограничений)
+     * @param int $offset Смещение
+     * @return array
      */
-    public function getByProjectId($projectId, $visibleOnly = false)
+    public function getByProjectId($projectId, $visibleOnly = false, $limit = null, $offset = 0)
     {
         $sql = "SELECT * FROM reviews WHERE project_id = ?";
         $params = [$projectId];
@@ -81,7 +86,30 @@ class ReviewManager
 
         $sql .= " ORDER BY date DESC";
 
+        if ($limit !== null) {
+            $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+        }
+
         return $this->db->fetchAll($sql, $params);
+    }
+
+    /**
+     * Получает общее количество отзывов проекта
+     * @param int $projectId ID проекта
+     * @param bool $visibleOnly Только видимые отзывы
+     * @return int
+     */
+    public function getTotalCountByProjectId($projectId, $visibleOnly = false)
+    {
+        $sql = "SELECT COUNT(*) as count FROM reviews WHERE project_id = ?";
+        $params = [$projectId];
+
+        if ($visibleOnly) {
+            $sql .= " AND visible = 1";
+        }
+
+        $result = $this->db->fetch($sql, $params);
+        return (int)($result['count'] ?? 0);
     }
 
     /**

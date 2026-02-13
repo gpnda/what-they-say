@@ -137,9 +137,88 @@
             border-left: 1px solid #e0e0e0;
         }
 
+        .wtsay-pagination {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wtsay-stats {
+            font-size: 14px;
+            color: #757575;
+            text-align: center;
+        }
+
+        .wtsay-load-more {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wtsay-load-more:hover {
+            background: #45a049;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .wtsay-load-more:active {
+            transform: translateY(0);
+        }
+
+        .wtsay-load-more:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wtsay-load-more.wtsay-loading {
+            opacity: 0.7;
+        }
+
+        .wtsay-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: wtsay-spin 0.8s linear infinite;
+        }
+
+        @keyframes wtsay-spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .wtsay-error {
+            color: #d32f2f;
+            text-align: center;
+            padding: 20px;
+            background: #ffebee;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
         @media (max-width: 640px) {
             .wtsay-date-time {
                 display: none;
+            }
+            
+            .wtsay-load-more {
+                width: 100%;
+                justify-content: center;
             }
         }
   `;
@@ -154,8 +233,11 @@
   const scriptHost = scriptUrl.split('/widgets/')[0] || window.location.origin;
   const ENDPOINT = window.WTSAY_ENDPOINT || (scriptHost + '/api/reviews.php');
 
+  // Хранилище состояния для каждого виджета
+  const widgetStates = new WeakMap();
+
   // Функция для загрузки и отображения виджета
-  async function loadWidget(element) {
+  async function loadWidget(element, page = 1, append = false) {
     try {
       // Получаем ID или другой идентификатор виджета из атрибутов элемента
       const widgetId = element.getAttribute('data-id');
@@ -166,27 +248,64 @@
         return;
       }
 
-      // Делаем запрос к эндпоинту с параметром widgetId (domain)
-      const url = `${ENDPOINT}/?id=${encodeURIComponent(widgetId)}`;
+      // Инициализируем состояние виджета при первой загрузке
+      if (!widgetStates.has(element)) {
+        const perPage = parseInt(element.getAttribute('data-per-page')) || 10;
+        widgetStates.set(element, {
+          currentPage: 0,
+          perPage: perPage,
+          hasMore: false,
+          loading: false,
+          totalCount: 0
+        });
+      }
+
+      const state = widgetStates.get(element);
+
+      // Предотвращаем множественные одновременные запросы
+      if (state.loading) {
+        return;
+      }
+
+      state.loading = true;
+      updateLoadMoreButton(element, true);
+
+      // Делаем запрос к эндпоинту с параметрами пагинации
+      const url = `${ENDPOINT}/?id=${encodeURIComponent(widgetId)}&page=${page}&per_page=${state.perPage}`;
       const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const result = await response.json();
+
+      // Обновляем состояние
+      state.currentPage = result.meta.page;
+      state.hasMore = result.meta.has_more;
+      state.totalCount = result.meta.total;
+      state.loading = false;
 
       // Отображаем данные внутри элемента
-      displayWidgetData(element, data);
+      displayWidgetData(element, result.data, append);
+      updatePagination(element);
     } catch (error) {
       console.error('Error loading widget:', error);
-      element.innerHTML = '<div class="wtsay-error">Ошибка при загрузке данных</div>';
+      const state = widgetStates.get(element);
+      if (state) state.loading = false;
+      
+      if (!append) {
+        element.innerHTML = '<div class="wtsay-error">Ошибка при загрузке данных</div>';
+      }
     }
   }
 
   // Функция для отображения данных
-  function displayWidgetData(element, data) {
-    element.innerHTML = '';
+  function displayWidgetData(element, data, append = false) {
+    if (!append) {
+      element.innerHTML = '';
+    }
+
     // Pixel-perfect HTML шаблон для одного отзыва
     function getReviewHTML(item) {
       // Форматирование даты и времени
@@ -220,15 +339,22 @@
       `;
     }
     if (Array.isArray(data)) {
-      const list = document.createElement('div');
-      list.className = 'wtsay-list';
+      let list = element.querySelector('.wtsay-list');
+      
+      // Создаем список при первой загрузке
+      if (!list) {
+        list = document.createElement('div');
+        list.className = 'wtsay-list';
+        element.appendChild(list);
+      }
+
+      // Добавляем отзывы
       data.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'wtsay-item';
         itemDiv.innerHTML = getReviewHTML(item);
         list.appendChild(itemDiv);
       });
-      element.appendChild(list);
     } else if (typeof data === 'object') {
       const div = document.createElement('div');
       div.className = 'wtsay-item';
@@ -250,6 +376,59 @@
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Создание или обновление UI пагинации
+  function updatePagination(element) {
+    const state = widgetStates.get(element);
+    if (!state) return;
+
+    let paginationContainer = element.querySelector('.wtsay-pagination');
+    
+    // Создаем контейнер пагинации если его нет
+    if (!paginationContainer) {
+      paginationContainer = document.createElement('div');
+      paginationContainer.className = 'wtsay-pagination';
+      element.appendChild(paginationContainer);
+    }
+
+    paginationContainer.innerHTML = '';
+
+    // Показываем статистику
+    const loadedCount = element.querySelectorAll('.wtsay-item').length;
+    const stats = document.createElement('div');
+    stats.className = 'wtsay-stats';
+    stats.textContent = `Показано ${loadedCount} из ${state.totalCount}`;
+    paginationContainer.appendChild(stats);
+
+    // Показываем кнопку "Загрузить ещё" только если есть еще отзывы
+    if (state.hasMore) {
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.className = 'wtsay-load-more';
+      loadMoreBtn.innerHTML = '<span class="wtsay-load-more-text">Загрузить ещё</span>';
+      
+      loadMoreBtn.addEventListener('click', () => {
+        loadWidget(element, state.currentPage + 1, true);
+      });
+
+      paginationContainer.appendChild(loadMoreBtn);
+    }
+  }
+
+  // Обновление состояния кнопки загрузки
+  function updateLoadMoreButton(element, loading) {
+    const button = element.querySelector('.wtsay-load-more');
+    if (!button) return;
+
+    if (loading) {
+      button.classList.add('wtsay-loading');
+      button.disabled = true;
+      button.innerHTML = '<span class="wtsay-spinner"></span><span class="wtsay-load-more-text">Загрузка...</span>';
+    } else {
+      button.classList.remove('wtsay-loading');
+      button.disabled = false;
+      button.innerHTML = '<span class="wtsay-load-more-text">Загрузить ещё</span>';
+    }
   }
 
   /**
