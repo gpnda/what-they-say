@@ -12,78 +12,140 @@
 (function() {
   'use strict';
 
-  // Встраиваем стили для горизонтального скролирования отзывов
-  const styles = `
-    .wtsay-list {
-      display: flex;
-      flex-direction: row;
-      gap: 15px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 10px 0;
-      scroll-behavior: smooth;
-    }
+  // Pixel-perfect CSS из beautiful_review_design.txt
+  const reviewWidgetCSS = `
+    .wtsay-widget {
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-    .wtsay-list::-webkit-scrollbar {
-      height: 8px;
-    }
+        .wtsay-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-    .wtsay-list::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
+        .wtsay-item {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+            position: relative;
+        }
 
-    .wtsay-list::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 4px;
-    }
+        .wtsay-item:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
 
-    .wtsay-list::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
+        .wtsay-item-head {
+            margin-bottom: 16px;
+        }
 
-    .wtsay-item {
-      flex: 0 0 300px;
-      min-width: 300px;
-      background-color: white;
-      border-left: 4px solid #007bff;
-      padding: 12px;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: box-shadow 0.3s ease;
-    }
+        .wtsay-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    .wtsay-item:hover {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
+        .wtsay-avatar {
+            flex-shrink: 0;
+        }
 
-    .wtsay-author {
-      font-weight: bold;
-      color: #007bff;
-      margin-bottom: 5px;
-    }
+        .wtsay-title {
+            flex: 1;
+        }
 
-    .wtsay-content {
-      color: #555;
-      margin-bottom: 8px;
-      overflow-wrap: break-word;
-    }
+        .wtsay-title-first-line {
+            margin-bottom: 0px;
+        }
 
-    .wtsay-date {
-      font-size: 0.85em;
-      color: #999;
-    }
+        .wtsay-title-second-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    .wtsay-error {
-      color: #d9534f;
-      padding: 10px;
-      background-color: #f8d7da;
-      border-radius: 4px;
-    }
+        .wtsay-item-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .wtsay-info-block {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .wtsay-person {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .wtsay-profile-img-block {
+            flex-shrink: 0;
+        }
+
+        .wtsay-profile-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e0e0e0;
+        }
+
+        .wtsay-text-block {
+            flex-grow: 1;
+        }
+
+        .wtsay-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a1a;
+        }
+
+        .wtsay-date {
+            font-size: 13px;
+            color: #757575;
+            font-style: italic;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .wtsay-rating {
+            font-size: 18px;
+            color: #FFD700;
+            letter-spacing: 2px;
+            user-select: none;
+            line-height: 18px;
+        }
+
+        .wtsay-source {
+            font-size: 12px;
+            color: #9e9e9e;
+            padding-left: 8px;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        @media (max-width: 640px) {
+            .wtsay-date-time {
+                display: none;
+            }
+        }
   `;
-
+  // Вставка стилей
   const styleSheet = document.createElement('style');
-  styleSheet.textContent = styles;
+  styleSheet.textContent = reviewWidgetCSS;
   document.head.appendChild(styleSheet);
 
   // Получаем базовый URL эндпоинта
@@ -125,42 +187,62 @@
   // Функция для отображения данных
   function displayWidgetData(element, data) {
     element.innerHTML = '';
-    
+    // Pixel-perfect HTML шаблон для одного отзыва
+    function getReviewHTML(item) {
+      // Форматирование даты и времени
+      const dateObj = new Date(item.date);
+      const dateValue = dateObj.toLocaleDateString('ru-RU');
+      const timeValue = dateObj.toLocaleTimeString('ru-RU');
+      
+      return `
+        <div class="wtsay-item-head">
+          <div class="wtsay-info">
+            <div class="wtsay-avatar">
+              ${item.avatar ? `<img class="wtsay-profile-img" src="${escapeHtml(item.avatar)}" alt="Avatar">` : ''}
+            </div>
+            <div class="wtsay-title">
+              <div class="wtsay-title-first-line">
+                <div class="wtsay-name">${escapeHtml(item.author)}</div>
+              </div>
+              <div class="wtsay-title-second-line">
+                ${item.rating ? `<div class="wtsay-rating" data-rating="${escapeHtml(item.rating)}"></div>` : ''}
+                ${item.source ? `<div class="wtsay-source">${escapeHtml(item.source)}</div>` : ''}
+              </div>
+            </div>
+          </div>
+          <div class="wtsay-date">
+            <span class="wtsay-date-value">${dateValue}</span><span class="wtsay-date-separator">, </span><span class="wtsay-date-time">${timeValue}</span>
+          </div>
+        </div>
+        <div class="wtsay-item-text">
+          ${escapeHtml(item.content)}
+        </div>
+      `;
+    }
     if (Array.isArray(data)) {
-      // Если это массив (например, список комментариев)
       const list = document.createElement('div');
       list.className = 'wtsay-list';
-      
       data.forEach(item => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'wtsay-item';
-        
-        const avatarHtml = item.avatar 
-          ? `<img src="${escapeHtml(item.avatar)}" alt="Avatar" style="width:32px;height:32px;border-radius:50%;margin-right:8px;vertical-align:middle;">`
-          : '';
-        
-        itemDiv.innerHTML = `
-          <div style="display:flex;align-items:center;margin-bottom:8px;">
-            ${avatarHtml}
-            <div class="wtsay-author">${escapeHtml(item.author)}</div>
-          </div>
-          <div class="wtsay-rating" style="font-size:0.9em;color:#ffa500;margin-bottom:5px;">★ ${escapeHtml(item.rating)}</div>
-          <div class="wtsay-content">${escapeHtml(item.content)}</div>
-          <div class="wtsay-date">${new Date(item.date).toLocaleString()}</div>
-        `;
+        itemDiv.innerHTML = getReviewHTML(item);
         list.appendChild(itemDiv);
       });
-      
       element.appendChild(list);
     } else if (typeof data === 'object') {
-      // Если это объект
       const div = document.createElement('div');
-      div.className = 'wtsay-content';
-      div.innerHTML = JSON.stringify(data);
+      div.className = 'wtsay-item';
+      div.innerHTML = getReviewHTML(data);
       element.appendChild(div);
     } else {
       element.textContent = data;
     }
+    
+    // Заполняем рейтинги звездами
+    element.querySelectorAll('.wtsay-rating[data-rating]').forEach(ratingElement => {
+      const rating = parseInt(ratingElement.dataset.rating) || 0;
+      ratingElement.textContent = generateStars(rating);
+    });
   }
 
   // Утилита для экранирования HTML
@@ -168,6 +250,26 @@
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  /**
+   * Генерирует звезды на основе рейтинга
+   * @param {number} rating - Рейтинг от 0 до 5
+   * @returns {string} Строка со звездами
+   */
+  function generateStars(rating) {
+      // Убедимся что рейтинг в допустимых пределах
+      rating = Math.max(0, Math.min(5, Math.floor(rating)));
+      
+      const filledStar = '★';
+      const emptyStar = '☆';
+      
+      // Генерируем заполненные звезды
+      const filled = filledStar.repeat(rating);
+      // Генерируем пустые звезды
+      const empty = emptyStar.repeat(5 - rating);
+      
+      return filled + empty;
   }
 
   // Инициализация при загрузке DOM
