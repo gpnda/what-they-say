@@ -6,7 +6,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-**WTSay** — это современный виджет для встраивания отзывов на ваш сайт. Красивый дизайн, постраничная загрузка, адаптивность под мобильные устройства и простая интеграция в 2 строки кода.
+**WTSay** — это виджет для встраивания отзывов на ваш сайт. Постраничная загрузка, адаптивность под мобильные устройства и простая интеграция в 2 строки кода.
 
 🌐 **[Домашняя страница проекта →](https://lumcode.ru/what-they-say/)**
 
@@ -28,14 +28,9 @@
 ## ✨ Возможности
 
 - ✅ **Простая интеграция** — всего 2 строки кода для подключения
-- ✅ **Красивый дизайн** — готовые стили с анимациями и адаптивностью
-- ✅ **Постраничная загрузка** — кнопка "Загрузить ещё" вместо классической пагинации
-- ✅ **Рейтинги звёздами** — автоматическое отображение оценок (★★★★★)
-- ✅ **Счётчик отзывов** — "Показано X из Y"
-- ✅ **Mobile-first дизайн** — отличный вид на всех устройствах
+- ✅ **Постраничная загрузка** — кнопка "Загрузить ещё"
 - ✅ **Без зависимостей** — чистый JavaScript, не требует jQuery или React
-- ✅ **REST API** — удобный доступ к данным отзывов
-- ✅ **CORS-ready** — работает с любых доменов
+
 
 ---
 
@@ -102,7 +97,6 @@ wtsay/
 ├── widgets/
 │   └── js/
 │       └── wtsay.js         # Клиентский JavaScript-виджет
-├── a8903412.php             # Adminer 5.4.1 (веб-интерфейс для БД)
 ├── example.html             # Демонстрация работы виджета
 ├── package.json             # NPM конфигурация (скрипт для dev-сервера)
 └── .env                     # Конфигурация базы данных (НЕ в Git!)
@@ -138,10 +132,6 @@ wtsay/
   - Форматирование рейтингов звёздами
   - Адаптивный дизайн
 
-#### Утилиты
-
-- **[a8903412.php](a8903412.php)** — Adminer для управления БД (только для разработки)
-- **[example.html](example.html)** — Демонстрационная страница с примерами
 
 ---
 
@@ -233,47 +223,6 @@ npm start
 # Сервер запустится на http://localhost:8000
 ```
 
-Или вручную:
-
-```bash
-php -S localhost:8000
-```
-
-#### Для продакшена:
-
-Настройте Nginx или Apache для обслуживания проекта. Пример конфигурации Nginx:
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /path/to/wtsay;
-    index index.php index.html;
-
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-        fastcgi_index index.php;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-}
-```
-
-### Шаг 6: Управление данными
-
-Откройте Adminer для управления отзывами:
-
-```
-http://localhost:8000/a8903412.php
-```
-
-**⚠️ Важно:** Удалите или защитите паролем `a8903412.php` в продакшене!
-
----
 
 ## 📡 API документация
 
@@ -331,31 +280,6 @@ curl "https://lumcode.ru/api/reviews.php?domain=example.com&page=1&per_page=10&v
 
 ---
 
-## 🛠️ Технологии
-
-### Backend Stack
-
-- **PHP 7.4+** — Серверная логика
-- **PDO** — Безопасная работа с базой данных
-- **MySQL/MariaDB** — Хранение данных
-- **REST API** — Архитектура API
-- **CORS** — Поддержка кросс-доменных запросов
-
-### Frontend Stack
-
-- **Vanilla JavaScript (ES6+)** — Без зависимостей
-- **Fetch API** — HTTP-запросы
-- **WeakMap** — Управление состоянием виджетов
-- **CSS3** — Grid, Flexbox, Transitions, Animations
-
-### Архитектурные паттерны
-
-- **MVC** — Разделение логики (Models → Managers, Controller → API, View → JS-виджет)
-- **Singleton** — Database класс для единственного соединения
-- **Dependency Injection** — Передача Database в Managers
-- **RESTful** — Стандартизированный API
-
----
 
 ## 🔒 Безопасность
 
@@ -390,12 +314,7 @@ curl "https://lumcode.ru/api/reviews.php?domain=example.com&page=1&per_page=10&v
    - ✅ Уже реализована через PDO Prepared Statements
    - ✅ Валидация рейтинга (0-5) на уровне БД
 
-6. **Удаление Adminer в продакшене**
-   ```bash
-   rm a8903412.php
-   ```
-
-7. **Регулярные обновления**
+6. **Регулярные обновления**
    - Следите за обновлениями PHP и MySQL
    - Используйте актуальные версии зависимостей
 
@@ -403,7 +322,7 @@ curl "https://lumcode.ru/api/reviews.php?domain=example.com&page=1&per_page=10&v
 
 ## 📄 Лицензия
 
-Этот проект разработан [LumCode](https://lumcode.ru).
+Этот проект разработан [Lum](https://lum.ru/).
 
 **Больше информации:**
 - 🌐 [Домашняя страница проекта](https://lumcode.ru/what-they-say/)
@@ -436,7 +355,7 @@ curl "https://lumcode.ru/api/reviews.php?domain=example.com&page=1&per_page=10&v
 
 <div align="center">
   
-**Сделано с ❤️ в [LumCode](https://lumcode.ru)**
+**Сделано с ❤️ в [Lum](https://lum.ru)**
 
 [Домашняя страница](https://lumcode.ru/what-they-say/) • [Демо](example.html) • [API Docs](#-api-документация)
 
